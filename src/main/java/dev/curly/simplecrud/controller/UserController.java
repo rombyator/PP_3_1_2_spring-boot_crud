@@ -1,7 +1,6 @@
 package dev.curly.simplecrud.controller;
 
 import dev.curly.simplecrud.model.User;
-import dev.curly.simplecrud.repository.UserRepository;
 import dev.curly.simplecrud.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
@@ -63,5 +62,12 @@ public class UserController {
         model.addAttribute("user", user);
 
         return "user/show";
+    }
+
+    @GetMapping("/{id}/delete")
+    public String delete(@PathVariable("id") long id) {
+        userService.delete(id);
+
+        return "redirect:/";
     }
 }
