@@ -2,6 +2,7 @@ package dev.curly.simplecrud.controller;
 
 import dev.curly.simplecrud.model.User;
 import dev.curly.simplecrud.repository.UserRepository;
+import dev.curly.simplecrud.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -10,12 +11,16 @@ import org.springframework.web.bind.annotation.*;
 @Controller
 @RequestMapping("/")
 public class UserController {
+    private final UserService userService;
+
     @Autowired
-    private UserRepository userRepo;
+    public UserController(UserService userService) {
+        this.userService = userService;
+    }
 
     @GetMapping
     public String index(Model model) {
-        model.addAttribute("users", userRepo.findAll());
+        model.addAttribute("users", userService.getAll());
 
         return "user/index";
     }
@@ -29,7 +34,7 @@ public class UserController {
 
     @PostMapping("/add")
     public String add(@ModelAttribute("user") User user, Model model) {
-        userRepo.save(user);
+        userService.update(user);
         model.addAttribute("user", user);
 
         return "user/show";
@@ -37,9 +42,7 @@ public class UserController {
 
     @GetMapping("/{id}")
     public String show(@PathVariable("id") long id, Model model) {
-        var user = userRepo
-            .findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid user id: " + id));
+        var user = userService.getById(id);
         model.addAttribute("user", user);
 
         return "user/show";
@@ -47,9 +50,7 @@ public class UserController {
 
     @GetMapping("/{id}/edit")
     public String edit(@PathVariable("id") long id, Model model) {
-        var user = userRepo
-            .findById(id)
-            .orElseThrow(() -> new IllegalArgumentException("Invalid user id: " + id));
+        var user = userService.getById(id);
         model.addAttribute("user", user);
 
         return "user/edit";
@@ -58,7 +59,7 @@ public class UserController {
     @PostMapping("/{id}/update")
     public String update(@PathVariable("id") long id, @ModelAttribute("user") User user, Model model) {
         user.setId(id);
-        userRepo.save(user);
+        userService.update(user);
         model.addAttribute("user", user);
 
         return "user/show";
